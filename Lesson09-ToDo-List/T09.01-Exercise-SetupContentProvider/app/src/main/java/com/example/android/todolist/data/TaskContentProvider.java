@@ -19,6 +19,7 @@ package com.example.android.todolist.data;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
@@ -31,33 +32,43 @@ public class TaskContentProvider extends ContentProvider {
     In this case, you’re working with a SQLite database, so you’ll need to
     initialize a DbHelper to gain access to it.
      */
+    TaskDbHelper taskDbHelper;
     @Override
     public boolean onCreate() {
         // TODO (2) Complete onCreate() and initialize a TaskDbhelper on startup
         // [Hint] Declare the DbHelper as a global variable
-
-        return false;
+        taskDbHelper = new TaskDbHelper(getContext());
+        return true;
     }
 
 
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
-
-        throw new UnsupportedOperationException("Not yet implemented");
+        SQLiteDatabase sqLiteDatabase = taskDbHelper.getWritableDatabase();
+        long id  = sqLiteDatabase.insert(TaskContract.TaskEntry.TABLE_NAME,null,values);
+        if( id> 0){
+            return Uri.withAppendedPath(uri,id);
+        }
+        else
+            throw new UnsupportedOperationException("Not yet implemented");
     }
 
 
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-
+        SQLiteDatabase sqLiteDatabase = taskDbHelper.getReadableDatabase()  ;
+        Cursor cursor = sqLiteDatabase.query(TaskContract.TaskEntry.TABLE_NAME,projection,selection,selectionArgs,null,null,sortOrder);
+        if(cursor != null){
+            return  cursor;
+        }else
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
-
+        SQLiteDatabase sqLiteDatabase = taskDbHelper.getWritableDatabase();
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
